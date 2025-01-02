@@ -103,3 +103,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # User model
 
 AUTH_USER_MODEL = 'models.User'
+
+
+# Thumbnail images path
+IMAGEKIT_CACHEFILE_DIR = 'media/users/thumbnails'

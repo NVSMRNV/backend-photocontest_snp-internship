@@ -22,7 +22,7 @@ class User(AbstractUser, Base):
     )
     profile_photo = models.ImageField(
         verbose_name='Фото профиля',
-        upload_to= 'images/users/',
+        upload_to= 'images/users/originals/',
         default='static/images/users/default.png',
         blank=True,
     )
@@ -43,5 +43,6 @@ class User(AbstractUser, Base):
 
     class Meta:
         db_table = 'users'
+        ordering = ['-created']
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
