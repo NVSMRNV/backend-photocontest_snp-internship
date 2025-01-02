@@ -1,0 +1,20 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+python-decouple = "*"
+isort = "*"
+psycopg2 = "*"
+django-split-settings = "*"
+django-imagekit = "*"
+pillow = "*"
+dj-database-url = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
