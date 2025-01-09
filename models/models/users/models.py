@@ -1,9 +1,11 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.db.models.signals import post_save, pre_save
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
 from models.models.basics.models import Base
+from utils.file_uploader import save_file, skip_saving_file, uploaded_file_path
 
 
 class User(AbstractUser, Base):
@@ -22,7 +24,7 @@ class User(AbstractUser, Base):
     )
     profile_photo = models.ImageField(
         verbose_name='Фото профиля',
-        upload_to= 'images/users/originals/',
+        upload_to= uploaded_file_path,
         default='static/images/users/default.png',
         blank=True,
     )
@@ -46,3 +48,7 @@ class User(AbstractUser, Base):
         ordering = ['-created']
         verbose_name = 'Пользователь'
         verbose_name_plural = 'Пользователи'
+
+
+pre_save.connect(skip_saving_file, sender=User)
+post_save.connect(save_file, sender=User)
