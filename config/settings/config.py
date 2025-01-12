@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from decouple import config
+from datetime import timedelta
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
@@ -9,8 +10,7 @@ DEBUG = config('DEBUG', cast=bool, default=False)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
 
 
-# Application definition
-
+#** Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,11 +19,16 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Third party
+    #* Third party
     'imagekit',
+    'service_objects',
+    'rest_framework',
+    'rest_framework_simplejwt',
+    'drf_yasg',
 
-    # Local
+    #* Local
     'models',
+    'api',
 ]
 
 MIDDLEWARE = [
@@ -57,8 +62,7 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 
-# Password validation
-
+#* Password validation
 AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
@@ -75,35 +79,46 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-
+#* Internationalization
 LANGUAGE_CODE = 'ru-ru'
 TIME_ZONE = 'UTC'
 USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-
+#* Static files (CSS, JavaScript, Images)
 STATIC_URL = 'static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'models/static')
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
-# Media files
-
+#* Media files
 MEDIA_URL = 'media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'models/media')
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
-# Default primary key field type
-
+#* Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
-# User model
-
+#* User model
 AUTH_USER_MODEL = 'models.User'
 
 
-# Thumbnail images path
+#* Thumbnail images path
 IMAGEKIT_CACHEFILE_DIR = 'media/users/thumbnails'
+
+
+#* Rest settings
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+    'EXCEPTION_HANDLER': 'utils.exception_handler.drf_exception_response'
+}
+
+
+#* JWT tokens settings
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=3),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+}
