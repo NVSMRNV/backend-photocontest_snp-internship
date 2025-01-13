@@ -52,12 +52,12 @@ class RetrieveUpdateDeleteUserAPIView(APIView):
 
     @swagger_auto_schema(**UPDATE_USER)
     def put(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePutUserService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(UpdatePutUserService, request.data | {'id': kwargs['pk']}, request.FILES)
         return Response(RetrieveUserSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**UPDATE_USER)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePatchUserService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(UpdatePatchUserService, request.data | {'id': kwargs['pk']}, request.FILES)
         return Response(RetrieveUserSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**DELETE_USER)

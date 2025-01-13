@@ -25,7 +25,8 @@ class UpdatePatchUserService(ServiceWithResult):
             self.result = self._update_user() 
         return self
 
-    def _update_user(self):
+    def _update_user(self) -> User:
+        self.cleaned_data = self._clear_cleaned_data()
         self.user.username = self.cleaned_data.get('username', self.user.username)
         self.user.bio = self.cleaned_data.get('bio', self.user.bio)
         self.user.email = self.cleaned_data.get('email', self.user.email)
@@ -33,6 +34,13 @@ class UpdatePatchUserService(ServiceWithResult):
         self.user.save()
 
         return self.user
+
+    def _clear_cleaned_data(self) -> dict:
+        result = {}
+        for key, value in self.cleaned_data.items():
+            if value:
+               result[key] = value 
+        return result
 
     def _get_user_by_id(self) -> User:
         try:
@@ -59,7 +67,7 @@ class UpdatePutUserService(ServiceWithResult):
     profile_photo = forms.ImageField(required=False)
     custom_validations = ['_validate_user_id']
 
-    def process(self):
+    def process(self) -> ServiceWithResult:
         self.run_custom_validations()
 
         if self.is_valid():
@@ -67,11 +75,11 @@ class UpdatePutUserService(ServiceWithResult):
             self.result = self._update_user() 
         return self
 
-    def _update_user(self):
-        self.user.username = self.cleaned_data.get('username', '')
-        self.user.bio = self.cleaned_data.get('bio', '')
-        self.user.email = self.cleaned_data.get('email', '')
-        self.user.profile_photo = self.cleaned_data.get('profile_photo', '')
+    def _update_user(self) -> User:
+        self.user.username = self.cleaned_data.get('username')
+        self.user.bio = self.cleaned_data.get('bio')
+        self.user.email = self.cleaned_data.get('email')
+        self.user.profile_photo = self.cleaned_data.get('profile_photo')
         self.user.save()
 
         return self.user
@@ -91,6 +99,4 @@ class UpdatePutUserService(ServiceWithResult):
                 )
             )
             self.response_status = status.HTTP_404_NOT_FOUND
-
-
     

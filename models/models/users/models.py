@@ -24,7 +24,7 @@ class User(AbstractUser, Base):
     )
     profile_photo = models.ImageField(
         verbose_name='Фото профиля',
-        upload_to= uploaded_file_path,
+        upload_to=uploaded_file_path,
         default='static/images/users/default.png',
         blank=True,
     )
