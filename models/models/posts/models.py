@@ -1,9 +1,12 @@
 from django.db import models
+from django.db.models.signals import post_save, pre_save
+
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
 from models.models.users.models import User
 from models.models.basics.models import Base
+from utils.file_uploader import save_file, skip_saving_file, uploaded_file_path
 
 
 class Post(Base):
@@ -28,10 +31,12 @@ class Post(Base):
         verbose_name='Заголовок',
     )
     description = models.TextField(
+        blank=True,
         verbose_name='Описание',
     )
     image = models.ImageField(
-        upload_to='images/photos/originals/',
+        upload_to=uploaded_file_path,
+        default='posts/default.jpg',
         blank=True,
         verbose_name='Изображение',
     )
@@ -59,3 +64,7 @@ class Post(Base):
     
     def get_votes_count(self) -> int:
         return self.votes.count()
+
+
+pre_save.connect(skip_saving_file, sender=Post)
+post_save.connect(save_file, sender=Post)
