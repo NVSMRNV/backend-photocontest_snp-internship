@@ -16,6 +16,7 @@ dj-database-url = "*"
 djangorestframework-simplejwt = "*"
 django-service-objects = {git = "https://github.com/dvkurbatov/django-service-objects.git"}
 drf-yasg = "*"
+channels = {extras = ["daphne"], version = "*"}
 
 [dev-packages]
 

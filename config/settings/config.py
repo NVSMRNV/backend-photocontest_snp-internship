@@ -12,6 +12,9 @@ ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.spl
 
 #** Application definition
 INSTALLED_APPS = [
+    #* Third party
+    'daphne',
+
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -21,6 +24,7 @@ INSTALLED_APPS = [
 
     #* Third party
     'imagekit',
+    'channels',
     'service_objects',
     'rest_framework',
     'rest_framework_simplejwt',
@@ -29,6 +33,7 @@ INSTALLED_APPS = [
     #* Local
     'models',
     'api',
+    'ws',
 ]
 
 MIDDLEWARE = [
@@ -59,8 +64,9 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
-
+#* ASGI / WSGI
+ASGI_APPLICATION = 'config.asgi.application'
+# WSGI_APPLICATION = 'config.wsgi.application'
 
 #* Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -121,4 +127,15 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=3),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
+}
+
+
+#* Channels
+CHANNEL_LAYERS = {
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
+        },
+    },
 }
