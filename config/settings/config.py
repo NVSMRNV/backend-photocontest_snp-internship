@@ -8,9 +8,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config('SECRET_KEY', cast=str)
 DEBUG = config('DEBUG', cast=bool, default=False)
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+BASE_DOMAIN = (
+    f"{config('SCHEMA', default='http')}://{config('DOMAIN', default='localhost:8000')}"
+) 
 
-
-#** Application definition
+#* Application definition
 INSTALLED_APPS = [
     #* Third party
     'daphne',
@@ -23,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     #* Third party
+    'corsheaders',
     'imagekit',
     'channels',
     'service_objects',
@@ -39,6 +42,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -139,3 +143,7 @@ CHANNEL_LAYERS = {
         },
     },
 }
+
+
+#* Cors
+CORS_ALLOW_ALL_ORIGINS = True

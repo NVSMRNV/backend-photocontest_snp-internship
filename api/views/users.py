@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.parsers import MultiPartParser
 
 from service_objects.services import ServiceOutcome
 
@@ -44,6 +45,7 @@ class CurrentUserAPIView(APIView):
 
 class RetrieveUpdateDeleteUserAPIView(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser]
 
     @swagger_auto_schema(**RETRIEVE_USER)
     def get(self, request: Request, *args, **kwargs) -> Response:
