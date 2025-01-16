@@ -31,13 +31,10 @@ class Post(Base):
         verbose_name='Заголовок',
     )
     description = models.TextField(
-        blank=True,
         verbose_name='Описание',
     )
     image = models.ImageField(
         upload_to=uploaded_file_path,
-        default='posts/default.jpg',
-        blank=True,
         verbose_name='Изображение',
     )
     image_thumbnail = ImageSpecField(
@@ -52,7 +49,11 @@ class Post(Base):
         default=PEN,
         verbose_name='Статус',
     )
-   
+    votes_number = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Количество голосов'
+    )
+
     class Meta:
         db_table = 'posts'
         ordering = ['-created']

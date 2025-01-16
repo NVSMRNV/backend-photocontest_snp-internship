@@ -2,7 +2,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 
 from service_objects.services import ServiceOutcome
 
@@ -17,14 +17,20 @@ from api.docs.posts import (
 from api.permissions.isowner import IsOwner
 from api.services.posts.create import CreatePostService
 from api.services.posts.delete import DeletePostService
+from api.services.posts.list import ListPostService
 from api.services.posts.retrieve import RetrievePostService
 from api.services.posts.update import UpdatePatchPostService, UpdatePutPostService
 from api.serializers.posts.retrieve import RetrievePostSerializer
 
 
 
-class CreatePostAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+class ListCreatePostAPIView(APIView):
+    permission_classes = [IsAuthenticatedOrReadOnly]
+
+    @swagger_auto_schema(**RETRIEVE_POST)
+    def get(self, request: Request, *args, **kwagrs) -> Response:
+        outcome = ServiceOutcome(ListPostService, request.data)
+        return Response(RetrievePostSerializer(outcome.result, many=True).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**CREATE_POST)
     def post(self, request: Request, *args, **kwargs) -> Response:
@@ -33,7 +39,7 @@ class CreatePostAPIView(APIView):
 
 
 class RetrieveUpdateDeletePostAPIView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(**RETRIEVE_POST)
     def get(self, request: Request, *args, **kwagrs) -> Response:

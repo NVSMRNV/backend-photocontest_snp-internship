@@ -13,9 +13,9 @@ from models.models.users.models import User
 
 class CreatePostService(ServiceWithResult):
     author = ModelField(User)
-    title = forms.CharField()
-    description = forms.CharField(required=False)
-    image = forms.ImageField(required=False)
+    title = forms.CharField(max_length=127)
+    description = forms.CharField(max_length=512)
+    image = forms.ImageField()
 
     def process(self) -> ServiceWithResult:
         if self.is_valid():
