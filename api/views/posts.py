@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
+from rest_framework.parsers import JSONParser, MultiPartParser
 
 from service_objects.services import ServiceOutcome
 
@@ -25,6 +26,7 @@ from api.serializers.posts.retrieve import RetrievePostSerializer
 
 
 class ListCreatePostAPIView(APIView):
+    parser_classes = [MultiPartParser, JSONParser]
     permission_classes = [IsAuthenticatedOrReadOnly]
 
     @swagger_auto_schema(**RETRIEVE_POST)
@@ -34,7 +36,7 @@ class ListCreatePostAPIView(APIView):
 
     @swagger_auto_schema(**CREATE_POST)
     def post(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(CreatePostService, request.data | {'author': request.user}, request.FILES)
+        outcome = ServiceOutcome(CreatePostService, request.data.dict() | {'author': request.user}, request.FILES)
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_201_CREATED)
 
 

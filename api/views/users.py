@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework.parsers import MultiPartParser
+from rest_framework.parsers import MultiPartParser, JSONParser
 
 from service_objects.services import ServiceOutcome
 
@@ -45,7 +45,7 @@ class CurrentUserAPIView(APIView):
 
 class RetrieveUpdateDeleteUserAPIView(APIView):
     permission_classes = [IsAuthenticated]
-    parser_classes = [MultiPartParser]
+    parser_classes = [MultiPartParser, JSONParser]
 
     @swagger_auto_schema(**RETRIEVE_USER)
     def get(self, request: Request, *args, **kwargs) -> Response:
@@ -59,7 +59,7 @@ class RetrieveUpdateDeleteUserAPIView(APIView):
 
     @swagger_auto_schema(**UPDATE_USER)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePatchUserService, request.data | {'id': kwargs['pk']}, request.FILES)
+        outcome = ServiceOutcome(UpdatePatchUserService, request.data.dict() | {'id': kwargs['pk']}, request.FILES)
         return Response(RetrieveUserSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**DELETE_USER)

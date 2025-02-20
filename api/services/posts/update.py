@@ -80,7 +80,7 @@ class UpdatePutPostService(ServiceWithResult):
         self.post.save()
 
         return self.post
-
+    
     def _get_post_by_id(self):
         try:
             return Post.objects.get(id=self.cleaned_data['id'])
