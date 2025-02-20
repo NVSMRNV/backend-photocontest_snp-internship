@@ -53,6 +53,10 @@ class Post(Base):
         default=0,
         verbose_name='Количество голосов'
     )
+    comments_number = models.PositiveBigIntegerField(
+        default=0,
+        verbose_name='Количество комментариев'
+    )
 
     class Meta:
         db_table = 'posts'
@@ -62,9 +66,6 @@ class Post(Base):
 
     def __str__(self) -> str:
         return self.title
-    
-    def get_votes_count(self) -> int:
-        return self.votes.count()
 
 
 pre_save.connect(skip_saving_file, sender=Post)
