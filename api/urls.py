@@ -5,7 +5,8 @@ from rest_framework_simplejwt.views import (
     TokenRefreshView,
 )
 
-from api.views.votes import CreateDeleteVoteAPIView
+from api.views.comments import ListCreateCommentAPIView, RetrieveUpdateDeleteCommentAPIView
+from api.views.votes import ListCreateDeleteVoteAPIView
 from api.views.posts import (
     ListCreatePostAPIView,
     RetrieveUpdateDeletePostAPIView,
@@ -18,9 +19,15 @@ from api.views.users import (
 from api.docs.schema import schema_view
 
 
+#! COMMENTS
+comments_api_urlpatterns = [
+    path('comments/', ListCreateCommentAPIView.as_view(), name=''),
+    path('comments/<int:pk>/', RetrieveUpdateDeleteCommentAPIView.as_view(), name=''),
+]
+
 #! VOTES
 votes_api_urlpatterns = [
-    path('votes/', CreateDeleteVoteAPIView.as_view(), name=''),
+    path('votes/', ListCreateDeleteVoteAPIView.as_view(), name=''),
 ]
 
 #! POSTS
@@ -48,6 +55,7 @@ docs_api_urlpatterns = [
 
 urlpatterns = [
     path('', include(posts_api_urlpatterns)),
+    path('', include(comments_api_urlpatterns)),
     path('', include(votes_api_urlpatterns)),
     path('', include(users_api_urlpatterns)),
     path('', include(docs_api_urlpatterns)),

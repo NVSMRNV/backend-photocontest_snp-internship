@@ -25,8 +25,7 @@ class ListCreateCommentAPIView(APIView):
     def post(self, request: Request, *args, **kwargs) -> Response:
         outcome = ServiceOutcome(
             CreateCommentService, 
-            request.data | {'author': request.user},
-            request.FILES
+            request.data | {'author_id': request.user.id},
         )
         return Response(RetrieveCommentSerializer(outcome.result).data, status=status.HTTP_201_CREATED)
 
@@ -38,14 +37,14 @@ class RetrieveUpdateDeleteCommentAPIView(APIView):
 
 
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePatchCommentService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(UpdatePatchCommentService, request.data | {'comment_id': kwargs['pk']})
         return Response(RetrieveCommentSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     def put(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePutCommentService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(UpdatePutCommentService, request.data | {'comment_id': kwargs['pk']})
         return Response(RetrieveCommentSerializer(outcome.result).data, status=status.HTTP_200_OK)
     
     def delete(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(DeleteCommentService, {'post': kwargs['pk']})
+        outcome = ServiceOutcome(DeleteCommentService, {'comment_id': kwargs['pk']})
         return Response(status=outcome.response_status)
         
