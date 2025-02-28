@@ -18,6 +18,7 @@ django-service-objects = {git = "https://github.com/dvkurbatov/django-service-ob
 drf-yasg = "*"
 channels = {extras = ["daphne"], version = "*"}
 django-cors-headers = "*"
+channels-redis = "*"
 
 [dev-packages]
 
