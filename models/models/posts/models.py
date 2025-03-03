@@ -1,11 +1,20 @@
 from django.db import models
-from django.db.models.signals import post_save, pre_save
+from django.dispatch import receiver
+from django.db.models.signals import (
+    post_save, 
+    post_delete,
+    pre_save, 
+    pre_delete,
+)
+
 
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
 from models.models.users.models import User
 from models.models.basics.models import Base
+from api.services.notifications.notify import NotifyService
+
 from utils.file_uploader import save_file, skip_saving_file, uploaded_file_path
 
 
@@ -70,3 +79,18 @@ class Post(Base):
 
 pre_save.connect(skip_saving_file, sender=Post)
 post_save.connect(save_file, sender=Post)
+
+
+@receiver(pre_delete, sender=Post)
+def notify_delete_post(sender, instance, **kwargs):
+    comment_authors = (
+        instance.comments.values_list('author_id', flat=True).distinct()
+    )
+
+    message = {
+        'type': 'delete post',
+        'text': 'Пост "{instance.title}" скоро будет удален.',
+    }
+
+    for author_id in comment_authors:
+        NotifyService.send(author_id, message)

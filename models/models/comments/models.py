@@ -1,5 +1,8 @@
 from django.db import models
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
+from api.services.notifications.notify import NotifyService
 from models.models.users.models import User
 from models.models.posts.models import Post
 from models.models.basics.models import Base
@@ -37,3 +40,11 @@ class Comment(Base):
         verbose_name = 'Комментарий'
         verbose_name_plural = 'Комментарии'
 
+
+@receiver(post_save, sender=Comment)
+def notify_new_comment(sender, instance, **kwargs):
+    message = {
+        'type': 'сomment',
+        'text': f'Под вашим постом "{instance.post}" {instance.user} оставил комментарий!'
+    }
+    NotifyService.send(instance.post.author.id, message)
