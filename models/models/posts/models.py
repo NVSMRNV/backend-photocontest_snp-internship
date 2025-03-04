@@ -8,6 +8,7 @@ from django.db.models.signals import (
 )
 
 
+from django_fsm import FSMField, transition
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
@@ -25,8 +26,8 @@ class Post(Base):
 
     STATUS_CHOICES = (
         (PEN, 'На модерации'),
-        (APP, 'Одобрена'),
-        (REJ, 'Отклонена'),
+        (APP, 'Одобрен'),
+        (REJ, 'Отклонен'),
     )
        
     author = models.ForeignKey(
@@ -52,11 +53,18 @@ class Post(Base):
         format='PNG',
         options={'quality': 60}
     )
-    status = models.CharField(
-        max_length=20, 
-        choices=STATUS_CHOICES,
-        default=PEN,
-        verbose_name='Статус',
+    # status = models.CharField(
+    #     max_length=20, 
+    #     choices=STATUS_CHOICES,
+    #     default=PEN,
+    #     verbose_name='Статус',
+    # )
+
+    status = FSMField(
+        default=PEN, 
+        choices=STATUS_CHOICES, 
+        protected=True,
+        verbose_name='Статус',  
     )
     votes_number = models.PositiveIntegerField(
         default=0,
@@ -66,6 +74,30 @@ class Post(Base):
         default=0,
         verbose_name='Количество комментариев'
     )
+
+    @transition(field=status, source='*', target=APP)
+    def to_state_app(self):
+        NotifyService.send(
+            self.author.id,
+            {'type': 'status_change', 'text': 'Ваш пост одобрен!'}
+        )
+        return 'Статус изменен на "Одобрен".'
+
+    @transition(field=status, source=PEN, target=REJ)
+    def to_state_rej(self):
+        NotifyService.send(
+            self.author.id,
+            {'type': 'status_change', 'text': 'Ваш пост отклонен.'}
+        )
+        return 'Статус изменен на "Отклонен".'
+
+    @transition(field=status, source='*', target=PEN)
+    def to_state_pen(self):
+        NotifyService.send(
+            self.author.id, 
+            {'type': 'status_change', 'text': 'Ваш пост снова на модерации.'}
+        )
+        return 'Статус изменен на "На модерации".'
 
     class Meta:
         db_table = 'posts'
@@ -94,3 +126,7 @@ def notify_delete_post(sender, instance, **kwargs):
 
     for author_id in comment_authors:
         NotifyService.send(author_id, message)
+
+
+
+    
