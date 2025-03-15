@@ -1,10 +1,9 @@
 from functools import lru_cache
+
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist
 from rest_framework import status
-from service_objects.fields import ModelField
-from service_objects.services import ServiceWithResult
 from service_objects.errors import ValidationError
+from service_objects.services import ServiceWithResult
 
 from models.models.comments.models import Comment
 from models.models.posts.models import Post
@@ -12,18 +11,17 @@ from models.models.users.models import User
 
 
 class CreateCommentService(ServiceWithResult):
-    author_id = forms.IntegerField()
-    post_id = forms.IntegerField()
-    parent_id = forms.IntegerField(required=False)
-    text = forms.CharField()
+    author_id = forms.IntegerField(min_value=1)
+    post_id = forms.IntegerField(min_value=1)
+    parent_id = forms.IntegerField(min_value=1, required=False)
+    text = forms.CharField(max_length=255)
     
     custom_validations = [
-        '_validate_author_exists',
         '_validate_post_exists',
         '_validate_parent_exists',
     ]
 
-    def process(self):
+    def process(self) -> ServiceWithResult:
         self.run_custom_validations()
         
         if self.is_valid():
@@ -31,63 +29,36 @@ class CreateCommentService(ServiceWithResult):
         return self
     
     def _create_comment(self):
-        return Comment.objects.create(
-            **self.cleaned_data
-        )
+        return Comment.objects.create(**self.cleaned_data)
 
+    @property
     @lru_cache
-    def _author(self):
-        try:
-            return User.objects.get(id=self.cleaned_data['author_id'])
-        except ObjectDoesNotExist():
-            return None
+    def _post(self) -> Post | None:
+        return Post.objects.filter(id=self.cleaned_data['post_id']).first()
 
+    @property
     @lru_cache
-    def _post(self):
-        try:
-            return Post.objects.get(id=self.cleaned_data['post_id'])
-        except ObjectDoesNotExist():
-            return None
-
-    @lru_cache
-    def _parent(self):
+    def _parent(self) -> Comment | None:
         if 'parent_id' in self.cleaned_data and self.cleaned_data['parent_id']:
-            try:
-                return Comment.objects.get(id=self.cleaned_data['parent_id'])
-            except Comment.DoesNotExist:
-                return None
+            return Comment.objects.filter(id=self.cleaned_data['parent_id']).first()
         return None
 
-    def _validate_author_exists(self):
-        if not self._author:
-            self.add_error(
-                'author_id',
-                ValidationError(
-                    message=f'Пользователь с id={self.cleaned_data['author_id']} не найден.'
-                )
-            )
-            self.response_status = status.HTTP_400_BAD_REQUEST
-
-    def _validate_post_exists(self):
+    def _validate_post_exists(self) -> None:
         if not self._post:
             self.add_error(
-                'post_id',
-                ValidationError(
-                    message=f'Пост с id={self.cleaned_data['author_id']} не найден.'
+                field='post_id',
+                error=ValidationError(
+                    message=f'Пост с id = {self.cleaned_data['author_id']} не найден.'
                 )
             )
-            self.response_status = status.HTTP_400_BAD_REQUEST
+            self.response_status = status.HTTP_404_NOT_FOUND
 
-
-
-    def _validate_parent_exists(self):
-        if 'parent_id' in self.cleaned_data and self.cleaned_data['parent_id']:
-            if not self._parent():
-                self.add_error(
-                    'parent_id',
-                    ValidationError(
-                        message=f'Родительский комментарий с id={self.cleaned_data["parent_id"]} не найден.'
-                    )
+    def _validate_parent_exists(self) -> None:
+        if not self._parent:
+            self.add_error(
+                field='parent_id',
+                error=ValidationError(
+                    message=f'Родительский комментарий с id = {self.cleaned_data["parent_id"]} не найден.'
                 )
-                self.response_status = status.HTTP_400_BAD_REQUEST
-    
+            )
+            self.response_status = status.HTTP_404_NOT_FOUND

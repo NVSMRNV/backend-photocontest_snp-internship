@@ -1,8 +1,7 @@
+from functools import lru_cache
+
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist
-
 from rest_framework import status
-
 from service_objects.errors import NotFound
 from service_objects.services import ServiceWithResult
 
@@ -10,30 +9,29 @@ from models.models.comments.models import Comment
 
 
 class DeleteCommentService(ServiceWithResult):
-    comment_id = forms.IntegerField()
+    comment_id = forms.IntegerField(min_value=1)
+    
     custom_validations = ['_validate_comment_id']
 
-    def process(self):
+    def process(self) -> ServiceWithResult:
         self.run_custom_validations()
 
         if self.is_valid():
-            self.comment = self._get_comment_by_id()
-            self.comment.delete()
-            self.response_status = status.HTTP_204_NO_CONTENT 
+            self._comment.delete()
+            self.response_status = status.HTTP_200_OK 
         return self
     
-    def _get_comment_by_id(self):
-        try:
-            return Comment.objects.get(id=self.cleaned_data['comment_id'])
-        except ObjectDoesNotExist:
-            return None
+    @property
+    @lru_cache
+    def _comment(self) -> Comment | None:
+        return Comment.objects.filter(id=self.cleaned_data['comment_id']).first()
 
-    def _validate_comment_id(self):
-        if not self._get_comment_by_id():
+    def _validate_comment_id(self) -> None:
+        if not self._comment:
             self.add_error(
-                'comment_id',
-                NotFound(
-                    message=f'Комментарий с id: {self.cleaned_data['comment_id']} не найден.'
+                field='comment_id',
+                error=NotFound(
+                    message=f'Комментарий с id = {self.cleaned_data['comment_id']} не найден.'
                 )
             )
             self.response_status = status.HTTP_404_NOT_FOUND

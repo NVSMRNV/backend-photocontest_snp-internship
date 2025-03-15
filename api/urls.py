@@ -22,8 +22,8 @@ from api.views.votes import CreateDeleteVoteAPIView
 
 #! COMMENTS
 comments_api_urlpatterns = [
-    path('comments/', ListCreateCommentAPIView.as_view(), name=''),
-    path('comments/<int:pk>/', RetrieveUpdateDeleteCommentAPIView.as_view(), name=''),
+    path('comments/', ListCreateCommentAPIView.as_view()),
+    path('comments/<int:id>/', RetrieveUpdateDeleteCommentAPIView.as_view()),
 ]
 
 #! VOTES
