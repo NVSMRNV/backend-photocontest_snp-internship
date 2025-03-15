@@ -4,7 +4,6 @@ from api.serializers.posts.create import CreatePostSerializer
 from api.serializers.posts.retrieve import RetrievePostSerializer
 from api.serializers.posts.update import UpdatePostSerializer
 
-
 CREATE_POST = {
     "tags": ["posts"],
     "operation_description": "Create new post",

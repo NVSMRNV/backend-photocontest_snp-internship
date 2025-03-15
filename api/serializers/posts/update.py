@@ -11,4 +11,4 @@ class UpdatePostSerializer(serializers.ModelSerializer):
             'title': {'required': False},
             'description': {'required': False},
             'image': {'required': False},
-        } 
+        }

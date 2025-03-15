@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from rest_framework import serializers
 
 from api.serializers.users.retrieve import RetrieveUserSerializer
@@ -30,4 +28,3 @@ class RetrievePostSerializer(serializers.ModelSerializer):
             'votes_number',
             'comments_number',
         ]
-

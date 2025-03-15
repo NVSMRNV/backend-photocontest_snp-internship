@@ -1,98 +1,63 @@
+from functools import lru_cache
 from django import forms
-from django.core.exceptions import ObjectDoesNotExist
-
 from rest_framework import status
-
-from service_objects.services import ServiceWithResult
 from service_objects.errors import NotFound
+from service_objects.services import ServiceWithResult
 
 from models.models.posts.models import Post
 
 
-class UpdatePatchPostService(ServiceWithResult):
-    id = forms.IntegerField()
-    title = forms.CharField(required=False)
-    description = forms.CharField(required=False)
+class UpdatePostService(ServiceWithResult):
+    id = forms.IntegerField(min_value=1)
+    title = forms.CharField(max_length=127, required=False)
+    description = forms.CharField(max_length=511, required=False)
     image = forms.ImageField(required=False)
+
     custom_validations = ['_validate_post_id']
 
     def process(self) -> ServiceWithResult:
         self.run_custom_validations()
 
         if self.is_valid():
-            self.post = self._get_post_by_id()
-            self.post = self._update_post()
+            self.result = self._update_post()
         return self
-    
+
+    @property
+    @lru_cache
+    def _post(self) -> Post | None:
+        return Post.objects.filter(id=self.cleaned_data['id']).first()
+
     def _update_post(self) -> Post:
-        self.cleaned_data = self._clear_cleaned_data()
-        self.post.title = self.cleaned_data.get('title', self.post.title)
-        self.post.description = self.cleaned_data.get('description', self.post.description)
-        self.post.image = self.cleaned_data.get('image', self.post.image)
-        self.post.save()
+        pass
 
-        return self.post
-
-    def _clear_cleaned_data(self) -> dict:
-        result = {}
-        for key, value in self.cleaned_data.items():
-            if value:
-               result[key] = value 
-        return result
-
-    def _get_post_by_id(self):
-        try:
-            return Post.objects.get(id=self.cleaned_data['id'])
-        except ObjectDoesNotExist:
-            return None
-
-    def _validate_post_id(self):
-        if not self._get_post_by_id():
+    def _validate_post_id(self) -> None:
+        if not self._post:
             self.add_error(
-                'id',
-                NotFound(
-                    message=f'Пост c id: {self.cleaned_data['id']} не найден.'
+                field='id',
+                error=NotFound(
+                    message=f'Пост c id = {self.cleaned_data['id']} не найден.'
                 )
             )
             self.response_status = status.HTTP_404_NOT_FOUND
 
 
-class UpdatePutPostService(ServiceWithResult):
-    id = forms.IntegerField()
-    title = forms.CharField(required=False)
-    description = forms.CharField(required=False)
-    image = forms.ImageField(required=False)
-    custom_validations = ['_validate_post_id']
-
-    def process(self) -> ServiceWithResult:
-        self.run_custom_validations()
-
-        if self.is_valid():
-            self.post = self._get_post_by_id()
-            self.post = self._update_post()
-        return self
-    
+class PartialUpdatePostService(UpdatePostService):
     def _update_post(self) -> Post:
-        self.cleaned_data = self._clear_cleaned_data()
-        self.post.title = self.cleaned_data.get('title')
-        self.post.description = self.cleaned_data.get('description')
-        self.post.image = self.cleaned_data.get('image')
-        self.post.save()
+        for field in ['title', 'description', 'image']:
+            value = self.cleaned_data.get(field)
+            if value is not None:
+                setattr(self._post, field, value)
+        self._post.save()
+        return self._post
 
-        return self.post
-    
-    def _get_post_by_id(self):
-        try:
-            return Post.objects.get(id=self.cleaned_data['id'])
-        except ObjectDoesNotExist:
-            return None
 
-    def _validate_post_id(self):
-        if not self._get_post_by_id():
-            self.add_error(
-                'id',
-                NotFound(
-                    message=f'Пост c id: {self.cleaned_data['id']} не найден.'
-                )
-            )
-            self.response_status = status.HTTP_404_NOT_FOUND
+class FullUpdatePostService(UpdatePostService):
+    def _update_post(self) -> Post:
+        for field in ['title', 'description', 'image']:
+            value = self.cleaned_data.get(field)
+            if value is not None:
+                setattr(self._post, field, value)
+            else:
+                setattr(self._post, field, None)
+        self._post.save()
+        return self._post

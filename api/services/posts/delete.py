@@ -1,39 +1,38 @@
+from functools import lru_cache
 from django import forms
 from django.core.exceptions import ObjectDoesNotExist
-
 from rest_framework import status
-
 from service_objects.errors import NotFound
 from service_objects.services import ServiceWithResult
 
+from api.tasks import delete_post_on_delay
 from models.models.posts.models import Post
 
 
 class DeletePostService(ServiceWithResult):
-    id = forms.IntegerField()
+    id = forms.IntegerField(min_value=1)
+    
     custom_validations = ['_validate_post_id']
 
-    def process(self):
+    def process(self) -> ServiceWithResult:
         self.run_custom_validations()
 
         if self.is_valid():
-            self.post = self._get_post_by_id()
-            self.post.delete()
+            delete_post_on_delay.apply_async(args=(self._post,), countdown=7)
             self.response_status = status.HTTP_204_NO_CONTENT 
         return self
-    
-    def _get_post_by_id(self):
-        try:
-            return Post.objects.get(id=self.cleaned_data['id'])
-        except ObjectDoesNotExist:
-            return None
 
-    def _validate_post_id(self):
-        if not self._get_post_by_id():
+    @property
+    @lru_cache
+    def _post(self) -> Post | None:
+        return Post.objects.filter(id=self.cleaned_data['id']).first()
+
+    def _validate_post_id(self) -> None:
+        if not self._post:
             self.add_error(
-                'id',
-                NotFound(
-                    message=f'Пост c id: {self.cleaned_data['id']} не найден.'
+                field='id',
+                error=NotFound(
+                    message=f'Пост c id = {self.cleaned_data['id']} не найден.'
                 )
             )
             self.response_status = status.HTTP_404_NOT_FOUND

@@ -28,13 +28,13 @@ comments_api_urlpatterns = [
 
 #! VOTES
 votes_api_urlpatterns = [
-    path('votes/', CreateDeleteVoteAPIView.as_view(),),
+    path('votes/', CreateDeleteVoteAPIView.as_view()),
 ]
 
 #! POSTS
 posts_api_urlpatterns = [
-    path('posts/', ListCreatePostAPIView.as_view(), name='post_list_create'),
-    path('posts/<int:pk>/', RetrieveUpdateDeletePostAPIView.as_view(), name='post_retrieve_update_delete'),
+    path('posts/', ListCreatePostAPIView.as_view()),
+    path('posts/<int:pk>/', RetrieveUpdateDeletePostAPIView.as_view()),
 ]
 
 #! USERS
