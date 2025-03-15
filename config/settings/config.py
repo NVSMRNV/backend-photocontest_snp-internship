@@ -1,8 +1,8 @@
 import os
-from pathlib import Path
-from decouple import config
 from datetime import timedelta
+from pathlib import Path
 
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 SECRET_KEY = config('SECRET_KEY', cast=str)

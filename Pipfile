@@ -20,6 +20,8 @@ channels = {extras = ["daphne"], version = "*"}
 django-cors-headers = "*"
 channels-redis = "*"
 django-fsm = "*"
+celery = "*"
+factory-boy = "*"
 
 [dev-packages]
 
