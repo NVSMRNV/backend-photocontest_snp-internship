@@ -38,9 +38,9 @@ posts_api_urlpatterns = [
 
 #! USERS
 users_api_urlpatterns = [   
-    path('users/registration/', RegisterUserAPIView.as_view(), name=''),
-    path('users/current/', CurrentUserAPIView.as_view(), name=''),
-    path('users/<int:pk>/', RetrieveUpdateDeleteUserAPIView.as_view(), name=''),
+    path('users/current/', CurrentUserAPIView.as_view()),
+    path('users/registration/', RegisterUserAPIView.as_view()),
+    path('users/<int:id>/', RetrieveUpdateDeleteUserAPIView.as_view()),
 
     path('users/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('users/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),

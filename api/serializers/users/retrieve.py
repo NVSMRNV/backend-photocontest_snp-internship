@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from config.settings.config import BASE_DOMAIN
 from models.models.users.models import User
 

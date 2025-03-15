@@ -1,10 +1,10 @@
+from functools import lru_cache
+
 from django import forms
 from django.contrib.auth.hashers import make_password
-
 from rest_framework import status
-
-from service_objects.services import ServiceWithResult
 from service_objects.errors import ValidationError
+from service_objects.services import ServiceWithResult
 
 from models.models.users.models import User
 
@@ -12,7 +12,8 @@ from models.models.users.models import User
 class RegisterUserService(ServiceWithResult):
     username = forms.CharField(max_length=127)
     password = forms.CharField(max_length=127)
-    custom_validations = ['_validate_user_already_exists']
+
+    custom_validations = ['_validate_username']
 
     def process(self) -> ServiceWithResult:
         self.run_custom_validations()
@@ -27,14 +28,17 @@ class RegisterUserService(ServiceWithResult):
             password=make_password(self.cleaned_data['password'])
         )
     
-    def _validate_user_already_exists(self) -> None:
-        exists = User.objects.filter(
-            username=self.cleaned_data['username']
-        ).exists()
-         
-        if exists:
+    @property
+    def _user(self) -> User | None:
+        return User.objects.filter(username=self.cleaned_data['username']).first()
+
+    def _validate_username(self) -> None:
+        if self._user:
             self.add_error(
-                'username',
-                ValidationError(message='Пользователь с таким именем уже существует.')
+                field='username',
+                error=ValidationError(
+                    message=f'Имя {self.cleaned_data["username"]} занято.'
+                )
             )
             self.response_status = status.HTTP_400_BAD_REQUEST
+         

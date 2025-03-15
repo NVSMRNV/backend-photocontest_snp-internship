@@ -1,9 +1,8 @@
 from drf_yasg import openapi
 
-from api.serializers.users.retrieve import RetrieveUserSerializer
 from api.serializers.users.register import RegisterUserSerializer
+from api.serializers.users.retrieve import RetrieveUserSerializer
 from api.serializers.users.update import UpdateUserSerializer
-
 
 REGISTER_USER = {
     "tags": ["users"],
@@ -38,7 +37,7 @@ DELETE_USER = {
     "tags": ["users"],
     "operation_description": "Delete user by id",
     "responses": {
-        204: openapi.Response('Success'),
+        200: openapi.Response('Success'),
         404: openapi.Response('Not found')  
     },
 }
