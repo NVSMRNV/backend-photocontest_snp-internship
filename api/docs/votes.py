@@ -1,7 +1,7 @@
 from drf_yasg import openapi
+
 from api.serializers.votes.create import CreateVoteSerializer
 from api.serializers.votes.retrieve import RetrieveVoteSerializer
-
 
 CREATE_VOTE = {
     "tags": ["votes"],
@@ -14,13 +14,12 @@ CREATE_VOTE = {
 }
 
 
-
 DELETE_VOTE = {
     "tags": ["votes"],
     "operation_description": "Delete vote",
     "request_body": CreateVoteSerializer,
     "responses": {
-        204: openapi.Response('Success'),
+        200: openapi.Response('Success'),
         404: openapi.Response('Not found')  
     },
 }

@@ -1,23 +1,24 @@
 from django.urls import include, path
-
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
-    TokenRefreshView,
+    TokenRefreshView
 )
 
-from api.views.comments import ListCreateCommentAPIView, RetrieveUpdateDeleteCommentAPIView
-from api.views.votes import ListCreateDeleteVoteAPIView
+from api.docs.schema import schema_view
+from api.views.comments import (
+    ListCreateCommentAPIView,
+    RetrieveUpdateDeleteCommentAPIView
+)
 from api.views.posts import (
     ListCreatePostAPIView,
-    RetrieveUpdateDeletePostAPIView,
-)
+    RetrieveUpdateDeletePostAPIView
+    )
 from api.views.users import (
     CurrentUserAPIView,
     RegisterUserAPIView,
-    RetrieveUpdateDeleteUserAPIView,
+    RetrieveUpdateDeleteUserAPIView
 )
-from api.docs.schema import schema_view
-
+from api.views.votes import CreateDeleteVoteAPIView
 
 #! COMMENTS
 comments_api_urlpatterns = [
@@ -27,7 +28,7 @@ comments_api_urlpatterns = [
 
 #! VOTES
 votes_api_urlpatterns = [
-    path('votes/', ListCreateDeleteVoteAPIView.as_view(), name=''),
+    path('votes/', CreateDeleteVoteAPIView.as_view(),),
 ]
 
 #! POSTS
