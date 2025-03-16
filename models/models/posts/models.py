@@ -13,7 +13,6 @@ from imagekit.processors import ResizeToFill
 from api.services.notifications.notify import NotifyService
 from models.models.basics.models import Base
 from models.models.comments.models import Comment
-from models.models.users.models import User
 from models.models.votes.models import Vote
 from utils.file_uploader import (
     save_file,
@@ -34,7 +33,7 @@ class Post(Base):
     )
        
     author = models.ForeignKey(
-        'User', 
+        'models.User', 
         on_delete=models.CASCADE,
         related_name='posts',
         verbose_name='Автор',

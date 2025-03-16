@@ -1,8 +1,10 @@
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import status
 from rest_framework.parsers import JSONParser, MultiPartParser
-from rest_framework.permissions import (IsAuthenticated,
-                                        IsAuthenticatedOrReadOnly)
+from rest_framework.permissions import (
+    IsAuthenticated,
+    IsAuthenticatedOrReadOnly
+)
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -15,8 +17,10 @@ from api.services.posts.create import CreatePostService
 from api.services.posts.delete import DeletePostService
 from api.services.posts.list import ListPostService
 from api.services.posts.retrieve import RetrievePostService
-from api.services.posts.update import (UpdatePatchPostService,
-                                       UpdatePutPostService)
+from api.services.posts.update import (
+    FullUpdatePostService,
+    PartialUpdatePostService,
+)
 
 
 class ListCreatePostAPIView(APIView):
@@ -44,12 +48,12 @@ class RetrieveUpdateDeletePostAPIView(APIView):
 
     @swagger_auto_schema(**UPDATE_POST)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePatchPostService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(PartialUpdatePostService, request.data | {'id': kwargs['pk']})
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**UPDATE_POST)
     def put(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePutPostService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(FullUpdatePostService, request.data | {'id': kwargs['pk']})
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_200_OK)
     
     @swagger_auto_schema(**DELETE_POST)

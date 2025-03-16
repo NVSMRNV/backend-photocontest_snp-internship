@@ -4,7 +4,6 @@ from django.dispatch import receiver
 
 from api.services.notifications.notify import NotifyService
 from models.models.basics.models import Base
-from models.models.posts.models import Post
 from models.models.users.models import User
 
 
@@ -16,7 +15,7 @@ class Comment(Base):
         verbose_name='Автор',
     )
     post = models.ForeignKey(
-        'Post',
+        'models.Post',
         on_delete=models.CASCADE,
         related_name='comments',
         verbose_name='Пост',

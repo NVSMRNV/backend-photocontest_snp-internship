@@ -20,8 +20,8 @@ from api.services.comments.create import CreateCommentService
 from api.services.comments.delete import DeleteCommentService
 from api.services.comments.list import ListCommentService
 from api.services.comments.update import (
-    UpdatePatchCommentService,
-    UpdatePutCommentService
+    FullUpdateCommentService,
+    PartialUpdateCommentService,
 )
 
 
@@ -44,12 +44,12 @@ class RetrieveUpdateDeleteCommentAPIView(APIView):
 
     @swagger_auto_schema(**UPDATE_COMMENT)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePatchCommentService, request.data | {'comment_id': kwargs['id']})
+        outcome = ServiceOutcome(PartialUpdateCommentService, request.data | {'comment_id': kwargs['id']})
         return Response(RetrieveCommentSerializer(outcome.result).data, status=status.HTTP_200_OK)
     
     @swagger_auto_schema(**UPDATE_COMMENT)
     def put(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(UpdatePutCommentService, request.data | {'comment_id': kwargs['id']})
+        outcome = ServiceOutcome(FullUpdateCommentService, request.data | {'comment_id': kwargs['id']})
         return Response(RetrieveCommentSerializer(outcome.result).data, status=status.HTTP_200_OK)
     
     @swagger_auto_schema(**DELETE_COMMENT)       
