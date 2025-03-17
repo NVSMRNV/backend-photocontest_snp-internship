@@ -16,10 +16,7 @@ class CreateCommentService(ServiceWithResult):
     parent_id = forms.IntegerField(min_value=1, required=False)
     text = forms.CharField(max_length=255)
     
-    custom_validations = [
-        '_validate_post_exists',
-        '_validate_parent_exists',
-    ]
+    custom_validations = ['_validate_post_exists', '_validate_parent_exists',]
 
     def process(self) -> ServiceWithResult:
         self.run_custom_validations()
@@ -54,7 +51,8 @@ class CreateCommentService(ServiceWithResult):
             self.response_status = status.HTTP_404_NOT_FOUND
 
     def _validate_parent_exists(self) -> None:
-        if not self._parent:
+        parent_id = self.cleaned_data.get('parent_id')
+        if parent_id and not self._parent:
             self.add_error(
                 field='parent_id',
                 error=ValidationError(

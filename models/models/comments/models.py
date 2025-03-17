@@ -50,7 +50,7 @@ def notify_new_comment(sender, instance, **kwargs):
         message={
             'text': (
                 f'Под вашим постом "{instance.post.title}"'
-                f'{instance.user} оставил комментарий!'
+                f'{instance.author} оставил комментарий!'
             )
         }
     )

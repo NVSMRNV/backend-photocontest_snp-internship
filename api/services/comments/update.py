@@ -43,7 +43,7 @@ class UpdateCommentService(ServiceWithResult):
 class PartialUpdateCommentService(UpdateCommentService):
     def _update_comment(self) -> Comment:
         text = self.cleaned_data.get('text')
-        if text is not None:
+        if text:
             setattr(self._comment, 'text', text)
         self._comment.save()
         return self._comment
@@ -52,7 +52,7 @@ class PartialUpdateCommentService(UpdateCommentService):
 class FullUpdateCommentService(UpdateCommentService):
     def _update_comment(self) -> Comment:
         text = self.cleaned_data.get('text')
-        if text is not None:
+        if text:
             setattr(self._comment, 'text', text)
         else:
             setattr(self._comment, 'text', None)
