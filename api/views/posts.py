@@ -11,7 +11,6 @@ from rest_framework.views import APIView
 from service_objects.services import ServiceOutcome
 
 from api.docs.posts import CREATE_POST, DELETE_POST, RETRIEVE_POST, UPDATE_POST
-from api.permissions.isowner import IsOwner
 from api.serializers.posts.retrieve import RetrievePostSerializer
 from api.services.posts.create import CreatePostService
 from api.services.posts.delete import DeletePostService
@@ -34,7 +33,7 @@ class ListCreatePostAPIView(APIView):
 
     @swagger_auto_schema(**CREATE_POST)
     def post(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(CreatePostService, request.data.dict() | {'author': request.user.id}, request.FILES)
+        outcome = ServiceOutcome(CreatePostService, request.data.dict() | {'author_id': request.user.id}, request.FILES)
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_201_CREATED)
 
 
@@ -43,21 +42,21 @@ class RetrieveUpdateDeletePostAPIView(APIView):
 
     @swagger_auto_schema(**RETRIEVE_POST)
     def get(self, request: Request, *args, **kwagrs) -> Response:
-        outcome = ServiceOutcome(RetrievePostService, {'id': kwagrs['pk']})
+        outcome = ServiceOutcome(RetrievePostService, {'id': kwagrs['id']})
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**UPDATE_POST)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(PartialUpdatePostService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(PartialUpdatePostService, request.data | {'id': kwargs['id']})
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**UPDATE_POST)
     def put(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(FullUpdatePostService, request.data | {'id': kwargs['pk']})
+        outcome = ServiceOutcome(FullUpdatePostService, request.data | {'id': kwargs['id']})
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_200_OK)
     
     @swagger_auto_schema(**DELETE_POST)
     def delete(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(DeletePostService, {'id': kwargs['pk']})
+        outcome = ServiceOutcome(DeletePostService, {'id': kwargs['id']})
         return Response(status=outcome.response_status)
         

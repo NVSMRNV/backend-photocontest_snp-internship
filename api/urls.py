@@ -34,7 +34,7 @@ votes_api_urlpatterns = [
 #! POSTS
 posts_api_urlpatterns = [
     path('posts/', ListCreatePostAPIView.as_view()),
-    path('posts/<int:pk>/', RetrieveUpdateDeletePostAPIView.as_view()),
+    path('posts/<int:id>/', RetrieveUpdateDeletePostAPIView.as_view()),
 ]
 
 #! USERS

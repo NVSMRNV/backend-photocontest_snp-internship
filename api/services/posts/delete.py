@@ -18,8 +18,8 @@ class DeletePostService(ServiceWithResult):
         self.run_custom_validations()
 
         if self.is_valid():
-            delete_post_on_delay.apply_async(args=(self._post,), countdown=7)
-            self.response_status = status.HTTP_204_NO_CONTENT 
+            delete_post_on_delay.apply_async(args=(self._post.id,), countdown=7)
+            self.response_status = status.HTTP_200_OK 
         return self
 
     @property

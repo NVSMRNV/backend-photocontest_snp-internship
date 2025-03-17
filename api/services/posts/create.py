@@ -3,10 +3,11 @@ from django import forms
 from service_objects.services import ServiceWithResult
 
 from models.models.posts.models import Post
+from models.models.users.models import User
 
 
 class CreatePostService(ServiceWithResult):
-    author = forms.IntegerField(min_value=1)
+    author_id = forms.IntegerField(min_value=1)
     title = forms.CharField(max_length=127)
     description = forms.CharField(max_length=511)
     image = forms.ImageField()
@@ -17,4 +18,8 @@ class CreatePostService(ServiceWithResult):
         return self
 
     def _create_post(self) -> Post:
-        return Post.objects.create(**self.cleaned_data)
+        return Post.objects.create(author=self._author, **self.cleaned_data)
+
+    @property
+    def _author(self):
+        return User.objects.get(id=self.cleaned_data['author_id'])

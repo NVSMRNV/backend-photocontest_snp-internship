@@ -45,7 +45,7 @@ class PartialUpdatePostService(UpdatePostService):
     def _update_post(self) -> Post:
         for field in ['title', 'description', 'image']:
             value = self.cleaned_data.get(field)
-            if value is not None:
+            if value:
                 setattr(self._post, field, value)
         self._post.save()
         return self._post
@@ -55,7 +55,7 @@ class FullUpdatePostService(UpdatePostService):
     def _update_post(self) -> Post:
         for field in ['title', 'description', 'image']:
             value = self.cleaned_data.get(field)
-            if value is not None:
+            if value:
                 setattr(self._post, field, value)
             else:
                 setattr(self._post, field, None)
