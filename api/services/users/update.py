@@ -47,19 +47,19 @@ class PartialUpdateUserService(UpdateUserService):
     def _update_user(self) -> User:
         for field in ['username', 'bio', 'email', 'profile_photo']:
             value = self.cleaned_data.get(field)
-            if value is not None:
-                setattr(self.user, field, value)
-        self.user.save()
-        return self.user
+            if value:
+                setattr(self._user, field, value)
+        self._user.save()
+        return self._user
 
 
 class FullUpdateUserService(UpdateUserService):
     def _update_user(self):
-        for field in ['username', 'bio', 'email', 'profile_photo']:
+        for field in ['bio', 'email', 'profile_photo']:
             value = self.cleaned_data.get(field)
-            if value is None:
-                setattr(self.user, field, None)
+            if value:
+                setattr(self._user, field, value)
             else:
-                setattr(self.user, field, value)
-        self.user.save()
-        return self.user
+                setattr(self._user, field, None)
+        self._user.save()
+        return self._user

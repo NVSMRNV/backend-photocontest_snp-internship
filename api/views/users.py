@@ -51,7 +51,7 @@ class RetrieveUpdateDeleteUserAPIView(APIView):
 
     @swagger_auto_schema(**UPDATE_USER)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(PartialUpdateUserService, request.data.dict() | {'id': kwargs['id']}, request.FILES)
+        outcome = ServiceOutcome(PartialUpdateUserService, request.data | {'id': kwargs['id']}, request.FILES)
         return Response(RetrieveUserSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**DELETE_USER)

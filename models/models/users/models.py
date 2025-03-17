@@ -17,10 +17,12 @@ class User(AbstractUser, Base):
     email = models.EmailField(
         verbose_name='Почта',
         blank=True,
+        null=True,
     )
     bio = models.TextField(
         verbose_name='Информация',
         blank=True,
+        null=True,
     )
     profile_photo = models.ImageField(
         verbose_name='Фото профиля',
