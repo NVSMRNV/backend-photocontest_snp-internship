@@ -52,7 +52,7 @@ class CreateVoteService(ServiceWithResult):
             self.response_status = status.HTTP_404_NOT_FOUND
 
     def _validate_vote_not_exists(self) -> None:
-        if self._vote():
+        if self._vote:
             self.add_error(
                 field='id',
                 error=ForbiddenError(
