@@ -28,7 +28,10 @@ class ListCreatePostAPIView(APIView):
 
     @swagger_auto_schema(**RETRIEVE_POST)
     def get(self, request: Request, *args, **kwagrs) -> Response:
-        outcome = ServiceOutcome(ListPostService, request.data)
+        outcome = ServiceOutcome(
+            ListPostService, 
+            request.data | {'author_id': request.GET.get('author_id'), 'user_id': request.user.id}
+        )
         return Response(RetrievePostSerializer(outcome.result, many=True).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**CREATE_POST)
@@ -47,12 +50,12 @@ class RetrieveUpdateDeletePostAPIView(APIView):
 
     @swagger_auto_schema(**UPDATE_POST)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(PartialUpdatePostService, request.data | {'id': kwargs['id']})
+        outcome = ServiceOutcome(PartialUpdatePostService, request.data.dict() | {'id': kwargs['id']}, request.FILES)
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**UPDATE_POST)
     def put(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(FullUpdatePostService, request.data | {'id': kwargs['id']})
+        outcome = ServiceOutcome(FullUpdatePostService, request.data.dict() | {'id': kwargs['id']}, request.FILES)
         return Response(RetrievePostSerializer(outcome.result).data, status=status.HTTP_200_OK)
     
     @swagger_auto_schema(**DELETE_POST)

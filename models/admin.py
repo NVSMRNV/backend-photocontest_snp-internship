@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.safestring import mark_safe
 from django_fsm import TransitionNotAllowed
 
@@ -51,22 +51,9 @@ class PostAdmin(admin.ModelAdmin):
     )
 
     def image_thumbnail(self, post: Post):
-        return mark_safe(f'<img src="{post.image_thumbnail.url}" width="150" height="150" />')
+        url = f"/admin/{post._meta.app_label}/{post._meta.model_name}/{post.id}/change/"
+        return mark_safe(f'<a href="{url}"><img src="{post.image_thumbnail.url}" width="150" height="150" /></a>')
     image_thumbnail.short_description = 'Фото'
-
-    def change_post_status(self, request, queryset, action):
-        for post in queryset:
-            try:
-                # получить метод нада и вызвать его
-                # getattr?
-                post.save()
-            except TransitionNotAllowed:
-                return
-            
-    # def reject_posts(self, request, queryset):
-    #     self.change_post_status(request, queryset, 'to_state_rej')
-    # reject_posts.short_description = 'Отклонить выбранные посты'
-
 
     def reject_posts(self, request, queryset):
         for post in queryset:
@@ -74,7 +61,9 @@ class PostAdmin(admin.ModelAdmin):
                 post.to_state_rej()
                 post.save()
             except TransitionNotAllowed:
+                self.message_user(request, 'Ошибка: Один или несколько постов нельзя отклонить.', messages.ERROR)
                 return
+        self.message_user(request, 'Выбранные посты успешно отклонены.', messages.SUCCESS)
     reject_posts.short_description = 'Отклонить выбранные посты'
 
     def approve_posts(self, request, queryset):
@@ -83,7 +72,9 @@ class PostAdmin(admin.ModelAdmin):
                 post.to_state_app()
                 post.save()
             except TransitionNotAllowed:
+                self.message_user(request, 'Ошибка: Один или несколько постов нельзя одобрить.', messages.ERROR)
                 return
+        self.message_user(request, 'Выбранные посты успешно одобрены.', messages.SUCCESS)
     approve_posts.short_description = 'Одобрить выбранные посты'
 
     def pending_posts(self, request, queryset):
@@ -92,7 +83,10 @@ class PostAdmin(admin.ModelAdmin):
                 post.to_state_pen()
                 post.save()
             except TransitionNotAllowed:
+                self.message_user(request, 'Ошибка: Один или несколько постов нельзя отправить на модерацию.', messages.ERROR)
                 return
+        self.message_user(request, 'Выбранные посты успешно отправлены на модерацию.', messages.SUCCESS)
+            
     pending_posts.short_description = 'На модерацию выбранные посты'
 
 

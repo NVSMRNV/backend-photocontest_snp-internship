@@ -126,8 +126,9 @@ def increase_votes_number(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Vote)
 def decrease_votes_number(sender, instance, **kwargs):
     post = instance.post
-    post.votes_number -= 1
-    post.save()
+    if post.votes_number > 0:
+        post.votes_number -= 1
+        post.save()
 
 
 #! Комменты
@@ -142,8 +143,9 @@ def increase_comments_number(sender, instance, created, **kwargs):
 @receiver(post_delete, sender=Comment)
 def decrease_comments_number(sender, instance, **kwargs):
     post = instance.post
-    post.comments_number -= 1
-    post.save()
+    if post.comments_number > 0:
+        post.comments_number -= 1
+        post.save()
 
 
 #! Уведомления

@@ -7,14 +7,20 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from service_objects.services import ServiceOutcome
 
-from api.docs.users import (DELETE_USER, REGISTER_USER, RETRIEVE_USER,
-                            UPDATE_USER)
+from api.docs.users import (
+    DELETE_USER,
+    REGISTER_USER,
+    RETRIEVE_USER,
+    UPDATE_USER
+)
 from api.serializers.users.retrieve import RetrieveUserSerializer
 from api.services.users.delete import DeleteUserService
 from api.services.users.register import RegisterUserService
 from api.services.users.retrieve import RetrieveUserService
-from api.services.users.update import (FullUpdateUserService,
-                                       PartialUpdateUserService)
+from api.services.users.update import (
+    FullUpdateUserService,
+    PartialUpdateUserService
+)
 
 
 class RegisterUserAPIView(APIView):
@@ -51,7 +57,7 @@ class RetrieveUpdateDeleteUserAPIView(APIView):
 
     @swagger_auto_schema(**UPDATE_USER)
     def patch(self, request: Request, *args, **kwargs) -> Response:
-        outcome = ServiceOutcome(PartialUpdateUserService, request.data | {'id': kwargs['id']}, request.FILES)
+        outcome = ServiceOutcome(PartialUpdateUserService, request.data.dict() | {'id': kwargs['id']}, request.FILES)
         return Response(RetrieveUserSerializer(outcome.result).data, status=status.HTTP_200_OK)
 
     @swagger_auto_schema(**DELETE_USER)

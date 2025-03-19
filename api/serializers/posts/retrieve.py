@@ -9,6 +9,7 @@ class RetrievePostSerializer(serializers.ModelSerializer):
     image = serializers.SerializerMethodField()
     author = RetrieveUserSerializer()
     created = serializers.SerializerMethodField()
+    is_liked_by_user = serializers.BooleanField(read_only=True)
 
     def get_created(self, instance):
         return instance.created.strftime("%d/%m/%Y • %H:%M")
@@ -23,8 +24,10 @@ class RetrievePostSerializer(serializers.ModelSerializer):
             'author',
             'title',
             'description',
+            'status',
             'image',
             'created',
             'votes_number',
             'comments_number',
+            'is_liked_by_user',
         ]
