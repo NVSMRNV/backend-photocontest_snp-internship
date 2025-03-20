@@ -6,7 +6,7 @@ from django.db.models.signals import (
     pre_save
 )
 from django.dispatch import receiver
-from django_fsm import FSMField, transition
+from django.utils.translation import gettext_lazy as _
 from imagekit.models import ImageSpecField
 from imagekit.processors import ResizeToFill
 
@@ -20,18 +20,14 @@ from utils.file_uploader import (
     uploaded_file_path,
 )
 
+class State(models.TextChoices):
+    PEN = 'PENDING', _('Pending')
+    APP = 'APPROVED', _('Approved')
+    REJ = 'REJECTED', _('Rejected')
+    DEL = 'ONDELETE', _('On delete')
 
-class Post(Base):
-    PEN = 'PENDING'
-    APP = 'APPROVED'
-    REJ = 'REJECTED'
 
-    STATUS_CHOICES = (
-        (PEN, 'На модерации'),
-        (APP, 'Одобрен'),
-        (REJ, 'Отклонен'),
-    )
-       
+class Post(Base):       
     author = models.ForeignKey(
         'models.User', 
         on_delete=models.CASCADE,
@@ -55,11 +51,11 @@ class Post(Base):
         format='PNG',
         options={'quality': 60}
     )
-    status = FSMField(
-        default=PEN, 
-        choices=STATUS_CHOICES, 
-        protected=True,
-        verbose_name='Статус',  
+    state = models.CharField(
+        max_length=50,
+        default=State.PEN,
+        choices=State.choices,
+        verbose_name='Статус',
     )
     votes_number = models.PositiveIntegerField(
         default=0,
@@ -69,36 +65,6 @@ class Post(Base):
         default=0,
         verbose_name='Количество комментариев'
     )
-
-    @transition(field=status, source='*', target=APP)
-    def to_state_app(self):
-        NotifyService.send(
-            user_id=self.author.id,
-            message={
-                'text': f'Ваш пост "{self.title}" одобрен!'
-            }
-        )
-        return 'Статус изменен на "Одобрен".'
-
-    @transition(field=status, source=PEN, target=REJ)
-    def to_state_rej(self):
-        NotifyService.send(
-            user_id=self.author.id,
-            message={
-                'text': f'Ваш пост "{self.title}" отклонен.'
-            }
-        )
-        return 'Статус изменен на "Отклонен".'
-
-    @transition(field=status, source='*', target=PEN)
-    def to_state_pen(self):
-        NotifyService.send(
-            user_id=self.author.id, 
-            message={
-                'text': f'Ваш пост "{self.title}" на модерации.'
-            }
-        )
-        return 'Статус изменен на "На модерации".'
 
     def __str__(self) -> str:
         return self.title
@@ -159,6 +125,6 @@ def notify_delete_post(sender, instance, **kwargs):
         NotifyService.send(
             user_id=author_id, 
             message={
-                'text': f'Пост "{instance.title}" скоро будет удален.'
+                'text': f'Пост "{instance.title}"скоро будет удален с Вашими комментариями.'
             }
         )

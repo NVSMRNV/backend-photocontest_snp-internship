@@ -1,17 +1,19 @@
 from django.contrib import admin, messages
 from django.utils.safestring import mark_safe
-from django_fsm import TransitionNotAllowed
 
 from models.models.comments.models import Comment
 from models.models.posts.models import Post
 from models.models.users.models import User
 from models.models.votes.models import Vote
+from utils.flows import Flow
+
+from viewflow.fsm import TransitionNotAllowed
 
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
     list_filter = (
-        'status',
+        'state',
     )
     search_fields = (
         'title',
@@ -22,7 +24,7 @@ class PostAdmin(admin.ModelAdmin):
         'author',
         'image_thumbnail',
         'image',
-        'status',
+        'state',
         'votes_number',
         'comments_number',
     ]
@@ -31,7 +33,7 @@ class PostAdmin(admin.ModelAdmin):
         'image_thumbnail',
         'title',
         'author',
-        'status',
+        'state',
         'votes_number',
         'comments_number',
     )
@@ -57,8 +59,9 @@ class PostAdmin(admin.ModelAdmin):
 
     def reject_posts(self, request, queryset):
         for post in queryset:
+            flow = Flow(post)
             try:
-                post.to_state_rej()
+                flow.reject()
                 post.save()
             except TransitionNotAllowed:
                 self.message_user(request, 'Ошибка: Один или несколько постов нельзя отклонить.', messages.ERROR)
@@ -68,8 +71,9 @@ class PostAdmin(admin.ModelAdmin):
 
     def approve_posts(self, request, queryset):
         for post in queryset:
+            flow = Flow(post)
             try:
-                post.to_state_app()
+                flow.approve()
                 post.save()
             except TransitionNotAllowed:
                 self.message_user(request, 'Ошибка: Один или несколько постов нельзя одобрить.', messages.ERROR)
@@ -79,8 +83,9 @@ class PostAdmin(admin.ModelAdmin):
 
     def pending_posts(self, request, queryset):
         for post in queryset:
+            flow = Flow(post)
             try:
-                post.to_state_pen()
+                flow.pending()
                 post.save()
             except TransitionNotAllowed:
                 self.message_user(request, 'Ошибка: Один или несколько постов нельзя отправить на модерацию.', messages.ERROR)

@@ -7,6 +7,7 @@ from service_objects.services import ServiceWithResult
 
 from api.tasks import delete_post_on_delay
 from models.models.posts.models import Post
+from utils.flows import Flow
 
 
 class DeletePostService(ServiceWithResult):
@@ -18,7 +19,10 @@ class DeletePostService(ServiceWithResult):
         self.run_custom_validations()
 
         if self.is_valid():
-            delete_post_on_delay.apply_async(args=(self._post.id,), countdown=7)
+            flow = Flow(self._post)
+            flow.delete()
+            self._post.save()
+            delete_post_on_delay.apply_async(args=(self._post.id,), countdown=20)
             self.response_status = status.HTTP_200_OK 
         return self
 

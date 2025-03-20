@@ -19,9 +19,9 @@ drf-yasg = "*"
 channels = {extras = ["daphne"], version = "*"}
 django-cors-headers = "*"
 channels-redis = "*"
-django-fsm = "*"
 celery = "*"
 factory-boy = "*"
+django-viewflow = "*"
 
 [dev-packages]
 
