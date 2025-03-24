@@ -1,0 +1,29 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+python-decouple = "*"
+isort = "*"
+psycopg2 = "*"
+django-split-settings = "*"
+django-imagekit = "*"
+pillow = "*"
+dj-database-url = "*"
+djangorestframework-simplejwt = "*"
+django-service-objects = {git = "https://github.com/dvkurbatov/django-service-objects.git"}
+drf-yasg = "*"
+channels = {extras = ["daphne"], version = "*"}
+django-cors-headers = "*"
+channels-redis = "*"
+celery = "*"
+factory-boy = "*"
+django-viewflow = "*"
+
+[dev-packages]
+
+[requires]
+python_version = "3.12"
