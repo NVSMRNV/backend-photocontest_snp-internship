@@ -8,7 +8,7 @@ django = "*"
 djangorestframework = "*"
 python-decouple = "*"
 isort = "*"
-psycopg2 = "*"
+psycopg2-binary = "*"
 django-split-settings = "*"
 django-imagekit = "*"
 pillow = "*"
@@ -27,3 +27,4 @@ django-viewflow = "*"
 
 [requires]
 python_version = "3.12"
+

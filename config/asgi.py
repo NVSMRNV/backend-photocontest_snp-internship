@@ -1,5 +1,8 @@
 import os
 
+import django
+django.setup()
+
 from channels.layers import get_channel_layer
 from channels.routing import ProtocolTypeRouter, URLRouter
 from django.core.asgi import get_asgi_application

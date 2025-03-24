@@ -5,12 +5,25 @@ from pathlib import Path
 from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
+
 SECRET_KEY = config('SECRET_KEY', cast=str)
+
 DEBUG = config('DEBUG', cast=bool, default=False)
+
 ALLOWED_HOSTS = config('ALLOWED_HOSTS', cast=lambda v: [s.strip() for s in v.split(',')])
+
 BASE_DOMAIN = (
     f"{config('SCHEMA', default='http')}://{config('DOMAIN', default='localhost:8000')}"
 ) 
+
+CORS_ALLOWED_ORIGINS = config(
+    'CORS_ALLOWED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')]
+)
+
+CSRF_TRUSTED_ORIGINS = config(
+    'CSRF_TRUSTED_ORIGINS', cast=lambda v: [s.strip() for s in v.split(',')]
+)
+
 
 #* Application definition
 INSTALLED_APPS = [
@@ -90,11 +103,6 @@ AUTH_PASSWORD_VALIDATORS = [
 
 
 #* Internationalization
-# LANGUAGE_CODE = 'ru-ru'
-# TIME_ZONE = 'UTC'
-# USE_I18N = True
-# USE_TZ = True
-
 LANGUAGE_CODE = 'ru'
 TIME_ZONE = 'Europe/Moscow'
 USE_I18N = True
@@ -150,7 +158,10 @@ CHANNEL_LAYERS = {
     },
 }
 
+<<<<<<< Updated upstream
 
 #* Cors
 CORS_ALLOW_ALL_ORIGINS = True
 CSRF_TRUSTED_ORIGINS = ''
+=======
+>>>>>>> Stashed changes

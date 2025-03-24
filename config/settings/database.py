@@ -2,5 +2,5 @@ import dj_database_url
 from decouple import config
 
 DATABASES = {
-    'default': dj_database_url.config(default=config('SQLITE_URL'))
+    'default': dj_database_url.config(default=config('POSTGRESQL_URL'))
 }
